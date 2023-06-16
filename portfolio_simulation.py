@@ -2,16 +2,28 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import datetime as dt
+
+pd.set_option('mode.chained_assignment', None)
 
 # Constants
 SPX_PATH = 'SPX.csv'
 START_YEAR = 1928
 END_YEAR = 2020
 
-# Load S&P 500 dataset into dataframe and create returns dataframe
+# Load S&P 500 dataset into dataframe and create daily close dataframe
 spx = pd.read_csv(SPX_PATH)
 spx_daily_close = spx[['Date', 'Adj Close']]
-# TODO: spx_yearly_close = 
+
+# Convert date column to datetime object
+spx_daily_close['Date'] = spx_daily_close['Date'].apply(lambda str_date : dt.datetime.strptime(str_date,'%Y-%m-%d'))
+
+# Select all rows where date is 31st of December
+spx_yearly_close = spx_daily_close.loc[(spx_daily_close['Date'].dt.month==12) & (spx_daily_close['Date'].dt.day==31)].reset_index(drop=True).to_string()
+
+# Add missing years where market did not end on 31st of December
+
+
 
 
 # Create yearly returns dataframe
@@ -60,11 +72,18 @@ class StockTools:
             start_date = random.randint(START_YEAR, END_YEAR - years)
             end_date = start_date + years
             
-            range = spx_yearly_returns.iloc[start_date:end_date+1]
+            range = self.df.iloc[start_date:end_date+1]
             
             return range
             
 
 
-### TESTING ###
-print(spx_close.iloc[:35])
+### TESTING/PRINTS ###
+
+all_years = [x for x in range(1928, 2020)]
+current_years = set(spx_yearly_close['Date'].dt.year)
+
+print(spx_daily_close)
+
+### TODO: For some reason spx_yearly_close is not a dataframe? 
+### Figure out how to convert it to a dataframe so that the current_years assignment works.
